@@ -11,47 +11,75 @@ package log is
 
    type t_level is (TRACE, DEBUG, INFO, WARN, ERROR);
 
-   type t_config is record
-      len           : natural;
+   type t_logger is protected
+      procedure set_level(lvl : t_level);
 
-      show_level    : boolean;
-      level         : t_level;
+      procedure trace(msg : string);
+      procedure debug(msg : string);
+      procedure info(msg : string);
+      procedure warn(msg : string);
+      procedure error(msg : string);
+   end protected;
 
-      show_sim_time : boolean;
-      time_unit     : time;
-   end record;
+   shared variable logger : t_logger;
 
-   shared variable config : t_config;
-
-   procedure log(level : t_level; msg : string);
+   procedure trace(msg : string);
+   procedure debug(msg : string);
+   procedure info(msg : string);
+   procedure warn(msg : string);
+   procedure error(msg : string);
 
 end package;
 
 package body log is
 
-   procedure log(level : t_level; msg : string) is
-      constant MAX_TIME_LEN : positive := 32;
-      variable time : string(0 to MAX_TIME_LEN-1);
-      variable time_line : line;
+   procedure trace(msg : string) is begin logger.trace(msg); end procedure;
+   procedure debug(msg : string) is begin logger.debug(msg); end procedure;
+   procedure info(msg : string) is begin logger.info(msg); end procedure;
+   procedure warn(msg : string) is begin logger.warn(msg); end procedure;
+   procedure error(msg : string) is begin logger.error(msg); end procedure;
 
-      procedure trim_time(t : inout string) is
+   type t_logger is protected body
+      variable level      : t_level := INFO;
+      variable show_level : boolean := true;
+
+      variable time_unit     : time    := ns;
+      variable show_sim_time : boolean := true;
+
+      procedure set_level(lvl : t_level) is
       begin
-         for i in t'reverse_range loop
-            if t(i) = ' ' then time(i) := nul; else return; end if;
-         end loop;
+         level := lvl;
       end procedure;
-   begin
-      if level < config.level then
-         return;
-      end if;
 
-      if config.show_sim_time then
-         write(time_line, now, left, MAX_TIME_LEN, config.time_unit);
-         time := time_line.all;
-         trim_time(time);
-      end if;
+      procedure log(lvl : t_level; msg : string) is
+         constant MAX_TIME_LEN : positive := 32;
+         variable time : string(0 to MAX_TIME_LEN-1);
+         variable time_line : line;
 
-      write(output, t_level'image(level) & ": " & time & ": " &  msg & LF);
-   end procedure;
+         procedure trim_time(t : inout string) is
+         begin
+            for i in t'reverse_range loop
+               if t(i) = ' ' then time(i) := nul; else return; end if;
+            end loop;
+         end procedure;
+      begin
+         if lvl < level then return; end if;
+
+         if show_sim_time then
+            write(time_line, now, left, MAX_TIME_LEN, time_unit);
+            time := time_line.all;
+            trim_time(time);
+         end if;
+
+         write(output, t_level'image(lvl) & ": " & time & ": " &  msg & LF);
+      end procedure;
+
+      procedure trace(msg : string) is begin log(TRACE, msg); end procedure;
+      procedure debug(msg : string) is begin log(DEBUG, msg); end procedure;
+      procedure info(msg : string) is begin log(INFO, msg); end procedure;
+      procedure warn(msg : string) is begin log(WARN, msg); end procedure;
+      procedure error(msg : string) is begin log(ERROR, msg); end procedure;
+
+   end protected body;
 
 end package body;

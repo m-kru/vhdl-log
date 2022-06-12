@@ -14,14 +14,13 @@ begin
    begin
       wait for 7.5 ns;
 
-      log.config.level := log.DEBUG;
-      log.config.show_level := true;
-      log.config.show_sim_time := true;
-      log.config.time_unit := ns;
+      log.logger.set_level(log.TRACE);
 
-      log.config.len := 64;
-      log.log(log.INFO, "Lorem");
-      log.log(log.ERROR, "ipsum");
+      log.trace("TRACE");
+      log.debug("DEBUG");
+      log.info("INFO");
+      log.warn("WARN");
+      log.error("ERROR");
 
       std.env.finish;
    end process;
