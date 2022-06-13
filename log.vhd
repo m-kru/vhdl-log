@@ -60,6 +60,7 @@ package body log is
          time_unit     : time;
          show_sim_time : boolean;
          prefix        : string;
+         separator     : string(1 to 3);
       end record;
 
       constant DEFAULT_CONFIG : t_config := (
@@ -67,7 +68,8 @@ package body log is
          show_level    => true,
          time_unit     => ns,
          show_sim_time => true,
-         prefix        => "" & nul
+         prefix        => "" & nul,
+         separator     => ": " & nul
       );
 
       variable config : t_config(prefix(1 to 1)) := DEFAULT_CONFIG;
@@ -104,7 +106,7 @@ package body log is
             trim_time(time);
          end if;
 
-         write(output, t_level'image(lvl) & ": " & time & ": " &  msg & LF);
+         write(output, t_level'image(lvl) & config.separator & time & config.separator &  msg & LF);
       end procedure;
 
 
