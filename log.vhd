@@ -59,7 +59,7 @@ package body log is
          show_level    : boolean;
          time_unit     : time;
          show_sim_time : boolean;
-         prefix        : string;
+         prefix        : string(1 to 32);
          separator     : string(1 to 3);
       end record;
 
@@ -68,11 +68,11 @@ package body log is
          show_level    => true,
          time_unit     => ns,
          show_sim_time => true,
-         prefix        => "" & nul,
+         prefix        => (1 to 6 => "prefix", others => nul),
          separator     => ": " & nul
       );
 
-      variable config : t_config(prefix(1 to 1)) := DEFAULT_CONFIG;
+      variable config : t_config := DEFAULT_CONFIG;
 
 
       impure function level return t_level is begin return config.level; end function;
