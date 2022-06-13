@@ -59,16 +59,18 @@ package body log is
          show_level    : boolean;
          time_unit     : time;
          show_sim_time : boolean;
+         prefix        : string;
       end record;
 
       constant DEFAULT_CONFIG : t_config := (
          level         => INFO,
          show_level    => true,
          time_unit     => ns,
-         show_sim_time => true
+         show_sim_time => true,
+         prefix        => "" & nul
       );
 
-      variable config : t_config := DEFAULT_CONFIG;
+      variable config : t_config(prefix(1 to 1)) := DEFAULT_CONFIG;
 
 
       impure function level return t_level is begin return config.level; end function;
