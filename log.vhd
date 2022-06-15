@@ -11,21 +11,27 @@ package log is
 
    type t_level is (TRACE, DEBUG, INFO, WARN, ERROR);
 
+   type t_config is record
+      level         : t_level;
+      show_level    : boolean;
+      time_unit     : time;
+      show_sim_time : boolean;
+      prefix        : string(1 to 32);
+      separator     : string(1 to 3);
+   end record;
+
+   constant DEFAULT_CONFIG : t_config := (
+      level         => INFO,
+      show_level    => true,
+      time_unit     => ns,
+      show_sim_time => true,
+      prefix        => (others => nul),
+      separator     => ": " & nul
+   );
+
    type t_logger is protected
-      -- Level returns current logger logging level.
-      impure function level return t_level;
-      -- Set_level sets logger logging level.
-      procedure set_level(lvl : t_level);
-
-      -- Enable_level enables printing logger level.
-      procedure enable_level;
-      -- Disable_level disables printing logger level.
-      procedure disable_level;
-
-      -- Time_unit returns current logger time unit used for simulator time printing.
-      impure function time_unit return time;
-      -- Set_time_unit sets logger time unit used for simulator time printing.
-      procedure set_time_unit(tu : time);
+      impure function config return t_config;
+      procedure set_config(c : t_config);
 
       procedure trace(msg : string);
       procedure debug(msg : string);
@@ -35,6 +41,8 @@ package log is
    end protected;
 
    shared variable logger : t_logger;
+
+   procedure set_level(l : t_level);
 
    procedure trace(msg : string);
    procedure debug(msg : string);
@@ -54,37 +62,10 @@ package body log is
 
    type t_logger is protected body
 
-      type t_config is record
-         level         : t_level;
-         show_level    : boolean;
-         time_unit     : time;
-         show_sim_time : boolean;
-         prefix        : string(1 to 32);
-         separator     : string(1 to 3);
-      end record;
+      variable cfg : t_config := DEFAULT_CONFIG;
 
-      constant DEFAULT_CONFIG : t_config := (
-         level         => INFO,
-         show_level    => true,
-         time_unit     => ns,
-         show_sim_time => true,
-         prefix        => (1 to 6 => "prefix", others => nul),
-         separator     => ": " & nul
-      );
-
-      variable config : t_config := DEFAULT_CONFIG;
-
-
-      impure function level return t_level is begin return config.level; end function;
-      procedure set_level(lvl : t_level) is begin config.level := lvl; end procedure;
-
-      procedure enable_level is begin config.show_level := true; end procedure;
-      procedure disable_level is begin config.show_level := false; end procedure;
-
-
-      impure function time_unit return time is begin return config.time_unit; end function;
-      procedure set_time_unit(tu : time) is begin config.time_unit := tu; end procedure;
-
+      impure function config return t_config is begin return cfg; end function;
+      procedure set_config(c : t_config) is begin cfg := c; end procedure;
 
       procedure log(lvl : t_level; msg : string) is
          constant MAX_TIME_LEN : positive := 32;
@@ -98,15 +79,15 @@ package body log is
             end loop;
          end procedure;
       begin
-         if lvl < config.level then return; end if;
+         if lvl < cfg.level then return; end if;
 
-         if config.show_sim_time then
-            write(time_line, now, left, MAX_TIME_LEN, config.time_unit);
+         if cfg.show_sim_time then
+            write(time_line, now, left, MAX_TIME_LEN, cfg.time_unit);
             time := time_line.all;
             trim_time(time);
          end if;
 
-         write(output, t_level'image(lvl) & config.separator & time & config.separator &  msg & LF);
+         write(output, t_level'image(lvl) & cfg.separator & time & cfg.separator &  msg & LF);
       end procedure;
 
 
@@ -117,5 +98,13 @@ package body log is
       procedure error(msg : string) is begin log(ERROR, msg); end procedure;
 
    end protected body;
+
+   procedure set_level(l : t_level) is
+      variable c : t_config;
+   begin
+      c := logger.config;
+      c.level := l;
+      logger.set_config(c);
+   end procedure;
 
 end package body;

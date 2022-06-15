@@ -14,7 +14,7 @@ begin
    begin
       wait for 7.5 ns;
 
-      log.logger.set_level(log.TRACE);
+      log.set_level(log.TRACE);
 
       log.trace("TRACE");
       log.debug("DEBUG");
