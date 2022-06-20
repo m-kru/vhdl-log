@@ -30,7 +30,7 @@ begin
             prefix => ("prefix: ", others => nul)
          )
       );
-      l.set_output("/tmp/vhdl/vhdl-log");
+      l.set_output("/tmp/vhdl-log");
       l.trace("TRACE");
       l.debug("DEBUG");
       l.info("INFO");
