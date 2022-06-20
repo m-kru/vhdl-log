@@ -139,6 +139,12 @@ package body log is
                if t(i) = ' ' then time(i) := nul; else return; end if;
             end loop;
          end procedure;
+
+         -- Fmt formats the output string.
+         impure function fmt return string is
+         begin
+            return s0(cfg.prefix) & t_level'image(lvl) & s0(cfg.separator) & s0(time) & s0(cfg.separator) & s0(msg) & LF;
+         end function;
       begin
          if lvl < cfg.level then return; end if;
 
@@ -148,16 +154,7 @@ package body log is
             trim_time(time);
          end if;
 
-         if output_set then
-            textio.write(
-               output, s0(cfg.prefix) & t_level'image(lvl) & s0(cfg.separator) & s0(time) & s0(cfg.separator) & s0(msg) & LF
-            );
-         else
-            textio.write(
-               textio.output, s0(cfg.prefix) & t_level'image(lvl) & s0(cfg.separator) & s0(time) & s0(cfg.separator) & s0(msg) & LF
-            );
-         end if;
-
+         if output_set then textio.write(output, fmt); else textio.write(textio.output, fmt); end if;
       end procedure;
 
       procedure trace(msg : string) is begin log(TRACE, msg); end procedure;
