@@ -11,15 +11,6 @@ package log is
 
    type t_level is (TRACE, DEBUG, NOTE, WARNING, ERROR, FAILURE);
 
-   type t_config is record
-      level         : t_level;
-      show_level    : boolean;
-      time_unit     : time;
-      show_sim_time : boolean;
-      prefix        : string(1 to 32);
-      separator     : string(1 to 3);
-   end record;
-
    type t_logger is protected
       procedure set_config(c : t_config);
       procedure set_output(filepath : string);
@@ -34,9 +25,9 @@ package log is
       procedure failure(msg : string);
    end protected;
 
+   -- Logger is the default log package logger used by the print, trace,
+   -- debug, note, warning, error and failure log package procedures.
    shared variable logger : t_logger;
-
-   procedure set_config(cfg : t_config);
 
    procedure print(msg : string);
 
@@ -47,6 +38,18 @@ package log is
    procedure error(msg : string);
    procedure failure(msg : string);
 
+   -- T_config is the configuraiton record type for the t_logger.
+   type t_config is record
+      level         : t_level;
+      show_level    : boolean;
+      time_unit     : time;
+      show_sim_time : boolean;
+      prefix        : string(1 to 32);
+      separator     : string(1 to 3);
+   end record;
+
+   -- Config function serves as the construction function for the t_config instance.
+   -- Default values for the parameters are also used for the log package default logger.
    function config(
       level         : t_level := NOTE;
       show_level    : boolean := true;
@@ -55,6 +58,9 @@ package log is
       prefix        : string(1 to 32) := (others => nul);
       separator     : string(1 to 3) := ": " & nul
    ) return t_config;
+
+   -- Set_config sets the config of the default log package logger.
+   procedure set_config(cfg : t_config);
 
 end package;
 
