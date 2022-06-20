@@ -20,9 +20,12 @@ begin
 
       log.trace("TRACE");
       log.debug("DEBUG");
-      log.info("INFO");
-      log.warn("WARN");
-      log.error("ERROR" & LF);
+      log.print("");
+      log.note("");
+      log.warning("WARNING");
+      log.error("ERROR");
+      -- failure causes simulation to finish and exit with status 1
+      --log.failure("FAILURE");
 
       l.set_config(
          log.config(
@@ -33,8 +36,9 @@ begin
       l.set_output("/tmp/vhdl-log");
       l.trace("TRACE");
       l.debug("DEBUG");
-      l.info("INFO");
-      l.warn("WARN");
+      l.print("");
+      l.note("NOTE");
+      l.warning("WARNING");
       l.error("ERROR");
 
       std.env.finish;

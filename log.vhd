@@ -9,7 +9,7 @@ library std;
 -- The one you have always wanted to use.
 package log is
 
-   type t_level is (TRACE, DEBUG, INFO, WARN, ERROR);
+   type t_level is (TRACE, DEBUG, NOTE, WARNING, ERROR, FAILURE);
 
    type t_config is record
       level         : t_level;
@@ -24,25 +24,31 @@ package log is
       procedure set_config(c : t_config);
       procedure set_output(filepath : string);
 
+      procedure print(msg : string);
+
       procedure trace(msg : string);
       procedure debug(msg : string);
-      procedure info(msg : string);
-      procedure warn(msg : string);
+      procedure note(msg : string);
+      procedure warning(msg : string);
       procedure error(msg : string);
+      procedure failure(msg : string);
    end protected;
 
    shared variable logger : t_logger;
 
    procedure set_config(cfg : t_config);
 
+   procedure print(msg : string);
+
    procedure trace(msg : string);
    procedure debug(msg : string);
-   procedure info(msg : string);
-   procedure warn(msg : string);
+   procedure note(msg : string);
+   procedure warning(msg : string);
    procedure error(msg : string);
+   procedure failure(msg : string);
 
    function config(
-      level         : t_level := INFO;
+      level         : t_level := NOTE;
       show_level    : boolean := true;
       time_unit     : time := ns;
       show_sim_time : boolean := true;
@@ -54,11 +60,14 @@ end package;
 
 package body log is
 
+   procedure print(msg : string) is begin logger.print(msg); end procedure;
+
    procedure trace(msg : string) is begin logger.trace(msg); end procedure;
    procedure debug(msg : string) is begin logger.debug(msg); end procedure;
-   procedure info(msg : string) is begin logger.info(msg); end procedure;
-   procedure warn(msg : string) is begin logger.warn(msg); end procedure;
+   procedure note(msg : string) is begin logger.note(msg); end procedure;
+   procedure warning(msg : string) is begin logger.warning(msg); end procedure;
    procedure error(msg : string) is begin logger.error(msg); end procedure;
+   procedure failure(msg : string) is begin logger.failure(msg); end procedure;
 
    type t_logger is protected body
 
@@ -73,6 +82,11 @@ package body log is
       begin
          textio.file_open(output, filepath, write_mode);
          output_set := true;
+      end procedure;
+
+      procedure print(msg : string) is
+      begin
+         if output_set then textio.write(output, msg & LF); else textio.write(textio.output, msg & LF); end if;
       end procedure;
 
       procedure log(lvl : t_level; msg : string) is
@@ -109,16 +123,17 @@ package body log is
 
       procedure trace(msg : string) is begin log(TRACE, msg); end procedure;
       procedure debug(msg : string) is begin log(DEBUG, msg); end procedure;
-      procedure info(msg : string) is begin log(INFO, msg); end procedure;
-      procedure warn(msg : string) is begin log(WARN, msg); end procedure;
+      procedure note(msg : string) is begin log(NOTE, msg); end procedure;
+      procedure warning(msg : string) is begin log(WARNING, msg); end procedure;
       procedure error(msg : string) is begin log(ERROR, msg); end procedure;
+      procedure failure(msg : string) is begin log(FAILURE, msg); std.env.finish(1); end procedure;
 
    end protected body;
 
    procedure set_config(cfg : t_config) is begin logger.set_config(cfg); end procedure;
 
    function config(
-      level         : t_level := INFO;
+      level         : t_level := NOTE;
       show_level    : boolean := true;
       time_unit     : time := ns;
       show_sim_time : boolean := true;
