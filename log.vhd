@@ -11,33 +11,6 @@ package log is
 
    type t_level is (TRACE, DEBUG, NOTE, WARNING, ERROR, FAILURE);
 
-   type t_logger is protected
-      procedure set_config(c : t_config);
-      procedure set_output(filepath : string);
-
-      procedure print(msg : string);
-
-      procedure trace(msg : string);
-      procedure debug(msg : string);
-      procedure note(msg : string);
-      procedure warning(msg : string);
-      procedure error(msg : string);
-      procedure failure(msg : string);
-   end protected;
-
-   -- Logger is the default log package logger used by the print, trace,
-   -- debug, note, warning, error and failure log package procedures.
-   shared variable logger : t_logger;
-
-   procedure print(msg : string);
-
-   procedure trace(msg : string);
-   procedure debug(msg : string);
-   procedure note(msg : string);
-   procedure warning(msg : string);
-   procedure error(msg : string);
-   procedure failure(msg : string);
-
    -- T_config is the configuraiton record type for the t_logger.
    type t_config is record
       level         : t_level;
@@ -61,6 +34,59 @@ package log is
 
    -- Set_config sets the config of the default log package logger.
    procedure set_config(cfg : t_config);
+
+   -- T_logger represents an active logging object that logs messages to the set output.
+   -- A logger can be simultaneously used from multiple places.
+   --
+   -- NOTE: If output is set to be a regular file, then nul bytes (0x00) will be also
+   -- be written to the file. However, they can be easily removeed, for example with
+   -- the following command "sed -i 's/\x0//g' log-file".
+   type t_logger is protected
+      -- Set_config sets the configuration of the logger.
+      procedure set_config(c : t_config);
+      -- Set_output sets the output of the logger.
+      -- The default output is stdout (textio.output precisely).
+      procedure set_output(filepath : string);
+
+      -- Print prints the message without adding any extra information such
+      -- as level or simulation time. The print prints the message regardless
+      -- of the set log level. It is usally used to print extra empty lines.
+      procedure print(msg : string);
+
+      -- Trace logs a message with level TRACE.
+      procedure trace(msg : string);
+      -- Debug logs a message with level DEBUG.
+      procedure debug(msg : string);
+      -- Note logs a message with level NOTE.
+      procedure note(msg : string);
+      -- Warning logs a message with level WARNING.
+      procedure warning(msg : string);
+      -- Error logs a message with level ERROR.
+      procedure error(msg : string);
+      -- Failure logs a message with level FAILURE.
+      procedure failure(msg : string);
+   end protected;
+
+   -- Logger is the default log package logger used by the print, trace,
+   -- debug, note, warning, error and failure log package procedures.
+   shared variable logger : t_logger;
+
+   -- Print prints message using the log package logger.
+   -- Check t_logger.print for more details.
+   procedure print(msg : string);
+   -- Trace logs a message with level TRACE using the log package logger.
+   procedure trace(msg : string);
+   -- Debug logs a message with level DEBUG using the log package logger.
+   procedure debug(msg : string);
+   -- Note logs a message with level NOTE using the log package logger.
+   procedure note(msg : string);
+   -- Warning logs a message with level WARNING using the log package logger.
+   procedure warning(msg : string);
+   -- Error logs a message with level ERROR using the log package logger.
+   procedure error(msg : string);
+   -- Failure logs a message with level FAILURE using the log package logger.
+   -- Check t_logger.failure for more details.
+   procedure failure(msg : string);
 
 end package;
 
