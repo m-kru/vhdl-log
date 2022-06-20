@@ -1,6 +1,4 @@
 library ieee;
-   use ieee.std_logic_1164.all;
-   use ieee.numeric_std.all;
 
 library work;
    use work.log;
@@ -19,7 +17,7 @@ begin
       log.trace("TRACE");
       log.debug("DEBUG");
       log.print("");
-      log.note("");
+      log.note("NOTE");
       log.warning("WARNING");
       log.error("ERROR");
       -- failure causes simulation to finish and exit with status 1
