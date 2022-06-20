@@ -9,7 +9,6 @@ entity test is
 end entity;
 
 architecture tb of test is
-
 begin
    main : process is
       variable l : log.t_logger;
@@ -17,7 +16,6 @@ begin
       wait for 7.5 ns;
 
       log.set_config(log.config(log.TRACE));
-
       log.trace("TRACE");
       log.debug("DEBUG");
       log.print("");
