@@ -37,10 +37,6 @@ package log is
 
    -- T_logger represents an active logging object that logs messages to the set output.
    -- A logger can be simultaneously used from multiple places.
-   --
-   -- NOTE: If output is set to be a regular file, then nul bytes (0x00) will be also
-   -- be written to the file. However, they can be easily removeed, for example with
-   -- the following command "sed -i 's/\x0//g' log-file".
    type t_logger is protected
       -- Set_config sets the configuration of the logger.
       procedure set_config(c : t_config);
@@ -101,6 +97,17 @@ package body log is
    procedure error(msg : string) is begin logger.error(msg); end procedure;
    procedure failure(msg : string) is begin logger.failure(msg); end procedure;
 
+   -- S0 returns string without trailing nul (0x00) bytes.
+   function s0(s : string) return string is
+   begin
+      for i in s'range loop
+         if s(i) = nul then
+            return s(1 to i - 1);
+         end if;
+      end loop;
+      return s;
+   end function;
+
    type t_logger is protected body
 
       variable cfg : t_config := config;
@@ -143,11 +150,11 @@ package body log is
 
          if output_set then
             textio.write(
-               output, cfg.prefix & t_level'image(lvl) & cfg.separator & time & cfg.separator & msg & LF
+               output, s0(cfg.prefix) & t_level'image(lvl) & s0(cfg.separator) & s0(time) & s0(cfg.separator) & s0(msg) & LF
             );
          else
             textio.write(
-               textio.output, cfg.prefix & t_level'image(lvl) & cfg.separator & time & cfg.separator & msg & LF
+               textio.output, s0(cfg.prefix) & t_level'image(lvl) & s0(cfg.separator) & s0(time) & s0(cfg.separator) & s0(msg) & LF
             );
          end if;
 
