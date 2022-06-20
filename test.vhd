@@ -1,5 +1,3 @@
-library ieee;
-
 library work;
    use work.log;
 
