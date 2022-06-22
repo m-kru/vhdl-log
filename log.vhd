@@ -5,13 +5,13 @@
 library std;
    use std.textio;
 
--- Log package implements simple logging mechanism.
+-- Package log implements simple logging mechanism.
 -- The one you have always wanted to use.
 package log is
 
    type t_level is (TRACE, DEBUG, NOTE, WARNING, ERROR, FAILURE);
 
-   -- T_config is the configuraiton record type for the t_logger.
+   -- t_config is the configuraiton type for the t_logger.
    type t_config is record
       level         : t_level;
       show_level    : boolean;
@@ -21,7 +21,7 @@ package log is
       separator     : string(1 to 3);
    end record;
 
-   -- Config function serves as the construction function for the t_config instance.
+   -- config serves as the initialization function for the t_config instance.
    -- Default values for the parameters are also used for the log package default logger.
    function config(
       level         : t_level := NOTE;
@@ -32,10 +32,10 @@ package log is
       separator     : string(1 to 3) := ": " & nul
    ) return t_config;
 
-   -- Set_config sets the config of the default log package logger.
+   -- set_config sets the config of the default log package logger.
    procedure set_config(cfg : t_config);
 
-   -- T_logger represents an active logging object that logs messages to the set output.
+   -- t_logger represents an active logging object that logs messages to the set output.
    -- A logger can be simultaneously used from multiple places.
    type t_logger is protected
       -- Set_config sets the configuration of the logger.
@@ -63,24 +63,24 @@ package log is
       procedure failure(msg : string);
    end protected;
 
-   -- Logger is the default log package logger used by the print, trace,
+   -- logger is the default log package logger used by the print, trace,
    -- debug, note, warning, error and failure log package procedures.
    shared variable logger : t_logger;
 
-   -- Print prints message using the log package logger.
+   -- print prints message using the log package logger.
    -- Check t_logger.print for more details.
    procedure print(msg : string);
-   -- Trace logs a message with level TRACE using the log package logger.
+   -- trace logs a message with level TRACE using the log package logger.
    procedure trace(msg : string);
-   -- Debug logs a message with level DEBUG using the log package logger.
+   -- debug logs a message with level DEBUG using the log package logger.
    procedure debug(msg : string);
-   -- Note logs a message with level NOTE using the log package logger.
+   -- note logs a message with level NOTE using the log package logger.
    procedure note(msg : string);
-   -- Warning logs a message with level WARNING using the log package logger.
+   -- warning logs a message with level WARNING using the log package logger.
    procedure warning(msg : string);
-   -- Error logs a message with level ERROR using the log package logger.
+   -- error logs a message with level ERROR using the log package logger.
    procedure error(msg : string);
-   -- Failure logs a message with level FAILURE using the log package logger.
+   -- failure logs a message with level FAILURE using the log package logger.
    -- Check t_logger.failure for more details.
    procedure failure(msg : string);
 
@@ -97,7 +97,7 @@ package body log is
    procedure error(msg : string) is begin logger.error(msg); end procedure;
    procedure failure(msg : string) is begin logger.failure(msg); end procedure;
 
-   -- S0 returns string without trailing nul (0x00) bytes.
+   -- s0 returns string without trailing nul (0x00) bytes.
    function s0(s : string) return string is
    begin
       for i in s'range loop
@@ -140,7 +140,7 @@ package body log is
             end loop;
          end procedure;
 
-         -- Fmt formats the output string.
+         -- fmt formats the output string.
          impure function fmt return string is
          begin
             return s0(cfg.prefix) & s0(time) & s0(cfg.separator) & t_level'image(lvl) & s0(cfg.separator) & s0(msg) & LF;
