@@ -38,28 +38,28 @@ package log is
    -- t_logger represents an active logging object that logs messages to the set output.
    -- A logger can be simultaneously used from multiple places.
    type t_logger is protected
-      -- Set_config sets the configuration of the logger.
+      -- set_config sets the configuration of the logger.
       procedure set_config(c : t_config);
-      -- Set_output sets the output of the logger.
+      -- set_output sets the output of the logger.
       -- The default output is stdout (textio.output precisely).
       procedure set_output(filepath : string);
 
-      -- Print prints the message without adding any extra information such
+      -- print prints the message without adding any extra information such
       -- as level or simulation time. The print prints the message regardless
       -- of the set log level. It is usally used to print extra empty lines.
       procedure print(msg : string);
 
-      -- Trace logs a message with level TRACE.
+      -- trace logs a message with level TRACE.
       procedure trace(msg : string);
-      -- Debug logs a message with level DEBUG.
+      -- debug logs a message with level DEBUG.
       procedure debug(msg : string);
-      -- Note logs a message with level NOTE.
+      -- note logs a message with level NOTE.
       procedure note(msg : string);
-      -- Warning logs a message with level WARNING.
+      -- warning logs a message with level WARNING.
       procedure warning(msg : string);
-      -- Error logs a message with level ERROR.
+      -- error logs a message with level ERROR.
       procedure error(msg : string);
-      -- Failure logs a message with level FAILURE.
+      -- failure logs a message with level FAILURE.
       procedure failure(msg : string);
    end protected;
 
